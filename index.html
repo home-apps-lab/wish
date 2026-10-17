@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ウィッシュ">
+<meta name="theme-color" content="#faf7f4">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="apple-touch-icon.png">
+<title>ウィッシュ</title>
+<style>
+:root{--bg:#faf7f4;--card:#fff;--ink:#2b2522;--sub:#8a7f78;--line:#ece4dd;--accent:#c9786b;--accent2:#f6e6e1;--got:#6f9b7e;--sale:#d6453a}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif;background:var(--bg);color:var(--ink);-webkit-tap-highlight-color:transparent}
+button{font:inherit;cursor:pointer}
+header{position:sticky;top:0;z-index:5;background:rgba(250,247,244,.96);backdrop-filter:blur(6px);padding:calc(12px + env(safe-area-inset-top)) 16px 8px;border-bottom:1px solid var(--line)}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:8px}
+h1{font-size:20px;margin:0}
+.sum{font-size:12px;color:var(--sub);text-align:right;line-height:1.4;margin-left:auto}
+.sum b{color:var(--ink);font-size:16px}
+.menuBtn{border:none;background:none;font-size:22px;color:var(--sub);padding:0 0 2px 6px;line-height:1}
+.tabs{display:flex;gap:6px;margin:10px 0 8px}
+.tab{flex:1;padding:8px;border:1px solid var(--line);background:#fff;border-radius:10px;font-size:14px;color:var(--ink)}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:#fff;font-size:13px;white-space:nowrap;color:var(--ink)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip.salechip{color:var(--sale);border-color:#f0c4bf}
+.chip.salechip.on{background:var(--sale);color:#fff;border-color:var(--sale)}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 16px 0;font-size:13px;color:var(--sub);max-width:1100px;margin:0 auto}
+.bar select{border:1px solid var(--line);border-radius:8px;padding:4px 6px;background:#fff;font-size:13px}
+main{padding:10px 12px 110px;max-width:1100px;margin:0 auto}
+.soon{background:#fff;border:1px solid #f0d3cd;border-radius:14px;padding:10px 12px;margin-bottom:10px}
+.soon h3{font-size:13px;margin:0 0 6px;color:var(--accent)}
+.soon div{font-size:14px;padding:6px 0;border-top:1px dashed var(--line);cursor:pointer;display:flex;gap:8px;align-items:center}
+.soon div:first-of-type{border-top:none}
+.soon .tag{flex:none;font-size:12px;border-radius:6px;padding:1px 6px;color:#fff;background:var(--accent)}
+.soon .tag.s{background:var(--sale)}
+.soon .t{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:700px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1000px){.grid{grid-template-columns:repeat(4,1fr)}}
+.card{background:var(--card);border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);cursor:pointer;position:relative}
+.ph{aspect-ratio:1/1;background:#f1ebe6;display:flex;align-items:center;justify-content:center;color:#c8bdb4;font-size:34px}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.card.got .ph img{opacity:.75}
+.info{padding:8px 10px 10px}
+.nm{font-size:14px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em}
+.pr{font-weight:700;margin-top:4px}
+.pr .old{font-weight:400;color:var(--sub);text-decoration:line-through;font-size:12px;margin-right:4px}
+.pr .new{color:var(--sale)}
+.shop{font-size:12px;color:var(--sub);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.day{font-size:12px;color:var(--accent);margin-top:2px}
+.stars{position:absolute;top:8px;left:8px;background:rgba(255,255,255,.92);border-radius:99px;padding:2px 7px;font-size:12px;color:var(--accent)}
+.salemark{position:absolute;top:8px;right:8px;background:var(--sale);color:#fff;border-radius:6px;padding:2px 7px;font-size:12px;font-weight:700}
+.gotmark{position:absolute;top:8px;right:8px;background:var(--got);color:#fff;border-radius:99px;padding:2px 8px;font-size:12px}
+.empty{text-align:center;color:var(--sub);padding:50px 20px;line-height:1.9}
+.btn{border:none;border-radius:12px;padding:12px 16px;font-size:15px;background:var(--accent);color:#fff}
+.btn.sub{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:#fff;color:#b5483c;border:1px solid #e8c9c4}
+.btn.ok{background:var(--got)}
+.fab{position:fixed;right:18px;bottom:calc(20px + env(safe-area-inset-bottom));border-radius:99px;padding:14px 22px;font-size:16px;box-shadow:0 4px 14px rgba(201,120,107,.45);z-index:6}
+.modal{position:fixed;inset:0;background:rgba(40,30,25,.45);display:none;align-items:flex-end;justify-content:center;z-index:10}
+.modal.open{display:flex}
+.sheet{background:var(--bg);width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom))}
+@media(min-width:700px){.modal{align-items:center}.sheet{border-radius:18px}}
+.sheet h2{font-size:17px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center}
+.x{border:none;background:none;font-size:24px;color:var(--sub);line-height:1}
+label{display:block;font-size:13px;color:var(--sub);margin:12px 0 4px}
+.f{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;font-size:16px;color:var(--ink);min-height:44px}
+.two{display:flex;gap:8px}.two>div{flex:1;min-width:0}
+.box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:4px 12px 12px;margin-top:14px}
+.box .ttl{font-size:14px;font-weight:700;margin-top:10px}
+.box .ttl small{font-weight:400;color:var(--sub)}
+.photoPick{aspect-ratio:4/3;border:2px dashed #ddd1c7;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--sub);background:#fff;cursor:pointer;overflow:hidden;font-size:14px;text-align:center;line-height:1.7}
+.photoPick img{width:100%;height:100%;object-fit:contain}
+.starPick{display:flex;gap:6px}
+.starPick button{flex:1;padding:8px 4px;border:1px solid var(--line);background:#fff;border-radius:10px;font-size:13px;color:var(--accent)}
+.starPick button.on{background:var(--accent2);border-color:var(--accent)}
+.row{display:flex;gap:8px;margin-top:16px}
+.row .btn{flex:1}
+.det-ph{border-radius:14px;overflow:hidden;background:#f1ebe6}
+.det-ph img{width:100%;display:block;max-height:55vh;object-fit:contain}
+.det-nm{font-size:18px;font-weight:700;margin:12px 0 4px}
+.det-pr{font-size:20px;font-weight:700;color:var(--accent)}
+.det-pr .old{font-size:14px;font-weight:400;color:var(--sub);text-decoration:line-through;margin-right:6px}
+.det-pr .new{color:var(--sale)}
+.pill{display:inline-block;font-size:13px;border-radius:8px;padding:3px 8px;margin:8px 6px 0 0}
+.pill.s{background:#fde9e7;color:var(--sale)}
+.pill.d{background:var(--accent2);color:var(--accent)}
+.pill.e{background:#eee;color:var(--sub)}
+.meta{font-size:14px;color:var(--sub);margin-top:8px;line-height:1.7}
+.memo{background:#fff;border-radius:10px;padding:10px;margin-top:10px;font-size:14px;white-space:pre-wrap;line-height:1.6}
+a.link{display:block;text-align:center;margin-top:12px;text-decoration:none}
+.newcat{display:none;gap:6px;margin-top:6px}
+.newcat.show{display:flex}
+.hint{font-size:12px;color:var(--sub);margin-top:4px;line-height:1.6}
+.warn{background:#fff4e5;color:#8a5a00;font-size:13px;padding:8px 12px;border-radius:10px;margin-bottom:10px;display:none}
+.menuList .btn{width:100%;margin-top:10px;text-align:left}
+.clear{border:none;background:none;color:var(--sub);font-size:12px;text-decoration:underline;padding:4px 0}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <h1>ウィッシュ</h1>
+    <div class="sum" id="sum"></div>
+    <button class="menuBtn" id="menuBtn" aria-label="メニュー">⋯</button>
+  </div>
+  <div class="tabs">
+    <button class="tab on" data-tab="want">ほしい</button>
+    <button class="tab" data-tab="got">買った・もらった</button>
+  </div>
+  <div class="chips" id="chips"></div>
+</header>
+<div class="bar">
+  <span id="count"></span>
+  <select id="sort" aria-label="並べかえ">
+    <option value="new">新しい順</option>
+    <option value="prio">ほしい度順</option>
+    <option value="date">日付が近い順</option>
+    <option value="low">安い順</option>
+    <option value="high">高い順</option>
+  </select>
+</div>
+<main>
+  <div class="warn" id="warn">この画面では記録を保存できません（プライベートブラウズなど）。閉じると消えます。</div>
+  <div id="soon"></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty"></div>
+</main>
+<button class="btn fab" id="addBtn">＋ 追加</button>
+
+<!-- 追加・編集 -->
+<div class="modal" id="formModal">
+  <div class="sheet">
+    <h2><span id="formTitle">ほしいものを追加</span><button class="x" data-close>×</button></h2>
+    <div class="photoPick" id="photoPick"></div>
+    <input type="file" id="photoInput" accept="image/*" hidden>
+    <label>名前</label>
+    <input class="f" id="fName" placeholder="例：ミニショルダーバッグ">
+    <label>種類</label>
+    <select class="f" id="fCat"></select>
+    <div class="newcat" id="newcat"><input class="f" id="fNewCat" placeholder="新しい種類の名前"></div>
+    <label>値段（円）</label>
+    <input class="f" id="fPrice" inputmode="numeric" placeholder="例：25000">
+    <label>お店・アプリ</label>
+    <input class="f" id="fShop" placeholder="例：ZOZOTOWN、楽天、Instagram">
+    <label>お店のページのアドレス（あれば）</label>
+    <input class="f" id="fUrl" inputmode="url" placeholder="https://…">
+    <div class="hint">アプリの「共有」→「コピー」で取ったアドレスを貼れます</div>
+    <label>ほしい度</label>
+    <div class="starPick" id="starPick">
+      <button data-s="1">★ いつか</button><button data-s="2">★★ ほしい</button><button data-s="3">★★★ 絶対</button>
+    </div>
+
+    <div class="box">
+      <div class="ttl">🏷 セール <small>（見つけたら入れる）</small></div>
+      <div class="two">
+        <div><label>セールの値段（円）</label><input class="f" id="fSalePrice" inputmode="numeric" placeholder="例：19800"></div>
+        <div><label>いつまで</label><input class="f" id="fSaleEnd" type="date"></div>
+      </div>
+      <button class="clear" data-clear="sale">セールを消す</button>
+    </div>
+
+    <div class="box">
+      <div class="ttl">📅 日付 <small>（誕生日・発売日など）</small></div>
+      <div class="two">
+        <div><label>何の日</label><input class="f" id="fEventName" placeholder="例：誕生日"></div>
+        <div><label>日付</label><input class="f" id="fEventDate" type="date"></div>
+      </div>
+      <button class="clear" data-clear="event">日付を消す</button>
+    </div>
+
+    <label>メモ</label>
+    <textarea class="f" id="fMemo" rows="3" placeholder="色・サイズなど"></textarea>
+    <div class="row">
+      <button class="btn sub" data-close>やめる</button>
+      <button class="btn" id="saveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- くわしく -->
+<div class="modal" id="detModal">
+  <div class="sheet" id="detBody"></div>
+</div>
+
+<!-- メニュー -->
+<div class="modal" id="menuModal">
+  <div class="sheet menuList">
+    <h2><span>メニュー</span><button class="x" data-close>×</button></h2>
+    <div class="hint">記録はこのスマホの中だけにあります。機種変更やもしものときのために、ときどきバックアップを保存してください。</div>
+    <button class="btn sub" id="backupBtn">💾 バックアップを保存する</button>
+    <button class="btn sub" id="restoreBtn">📂 バックアップから戻す</button>
+    <input type="file" id="restoreInput" accept="application/json,.json" hidden>
+    <div class="hint" id="backupInfo" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<script>
+const DEFAULT_CATS=['バッグ','指輪','アクセサリー','服','靴','コスメ','その他'];
+const $=id=>document.getElementById(id);
+let db=null, items=[], cats=DEFAULT_CATS.slice();
+let view={tab:'want',cat:'すべて',sort:'new'};
+let editing=null, formPhoto=null, formStars=2, current=null;
+const DEMO=new URLSearchParams(location.search).has('demo');
+const SALE='🏷 セール中';
+
+/* ---------- 保存（このスマホの中） ---------- */
+function openDB(){return new Promise((res,rej)=>{
+  const r=indexedDB.open('wishlist',1);
+  r.onupgradeneeded=()=>{r.result.createObjectStore('items',{keyPath:'id'});r.result.createObjectStore('meta');};
+  r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);
+});}
+function run(store,mode,fn){return new Promise((res,rej)=>{
+  if(!db){res(null);return;}
+  const t=db.transaction(store,mode);const q=fn(t.objectStore(store));
+  t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error);
+});}
+const putItem=it=>run('items','readwrite',s=>s.put(it));
+const delItem=id=>run('items','readwrite',s=>s.delete(id));
+const saveCats=()=>run('meta','readwrite',s=>s.put(cats,'cats'));
+const setMeta=(k,v)=>run('meta','readwrite',s=>s.put(v,k));
+const getMeta=k=>run('meta','readonly',s=>s.get(k));
+
+async function init(){
+  if(DEMO){
+    items=demoItems();render();
+    const show=new URLSearchParams(location.search).get('show');
+    if(show==='form')openForm(items[2]);else if(show)openDetail(items.find(i=>i.id===show));
+    return;
+  }
+  else{
+    try{
+      db=await openDB();
+      items=(await run('items','readonly',s=>s.getAll()))||[];
+      const c=await getMeta('cats');
+      if(c&&c.length)cats=c;
+      if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
+    }catch(e){db=null;$('warn').style.display='block';}
+  }
+  render();
+}
+
+/* ---------- 日付・値段 ---------- */
+function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+const today=()=>ymd(new Date());
+const daysTo=s=>Math.round((new Date(s+'T00:00')-new Date(today()+'T00:00'))/864e5);
+const md=s=>{const [y,m,d]=s.split('-');return `${+m}/${+d}`;};
+const num=v=>v===''||v==null?null:Number(v);
+const saleOn=i=>num(i.salePrice)!=null&&(!i.saleEnd||daysTo(i.saleEnd)>=0);
+const saleOver=i=>num(i.salePrice)!=null&&i.saleEnd&&daysTo(i.saleEnd)<0;
+const eff=i=>saleOn(i)?num(i.salePrice):num(i.price);
+const off=i=>{const p=num(i.price),s=num(i.salePrice);return p&&s!=null&&s<p?Math.round((1-s/p)*100):0;};
+const yen=n=>n==null?'':'¥'+Number(n).toLocaleString();
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const starTxt=n=>'★'.repeat(n||1);
+function leftTxt(n){return n===0?'今日':n>0?'あと'+n+'日':(-n)+'日前';}
+function priceHtml(i,cls){
+  if(saleOn(i)){
+    return `${num(i.price)!=null?`<span class="old">${yen(num(i.price))}</span>`:''}<span class="new">${yen(num(i.salePrice))}</span>`;
+  }
+  return num(i.price)!=null?yen(num(i.price)):`<span style="color:var(--sub);font-weight:400;font-size:13px">値段なし</span>`;
+}
+
+/* ---------- 表示 ---------- */
+function render(){
+  const inTab=items.filter(i=>(i.status||'want')===view.tab);
+  const used=[...new Set(inTab.map(i=>i.cat))];
+  const saleN=view.tab==='want'?inTab.filter(saleOn).length:0;
+  const chipCats=['すべて',...(saleN?[SALE]:[]),...cats.filter(c=>used.includes(c)),...used.filter(c=>!cats.includes(c))];
+  if(!chipCats.includes(view.cat))view.cat='すべて';
+  $('chips').innerHTML=chipCats.map(c=>{
+    const n=c==='すべて'?inTab.length:c===SALE?saleN:inTab.filter(i=>i.cat===c).length;
+    return `<button class="chip${c===SALE?' salechip':''}${c===view.cat?' on':''}" data-cat="${esc(c)}">${esc(c)} ${n}</button>`;
+  }).join('');
+  let list=inTab.filter(i=>view.cat==='すべて'||(view.cat===SALE?saleOn(i):i.cat===view.cat));
+  const dkey=i=>{const ds=[];if(i.eventDate&&daysTo(i.eventDate)>=0)ds.push(daysTo(i.eventDate));if(saleOn(i)&&i.saleEnd)ds.push(daysTo(i.saleEnd));return ds.length?Math.min(...ds):Infinity;};
+  const sorters={
+    new:(a,b)=>b.created-a.created,
+    prio:(a,b)=>(b.stars-a.stars)||(b.created-a.created),
+    date:(a,b)=>(dkey(a)-dkey(b))||(b.created-a.created),
+    low:(a,b)=>(eff(a)??Infinity)-(eff(b)??Infinity),
+    high:(a,b)=>(eff(b)??-1)-(eff(a)??-1)
+  };
+  list.sort(sorters[view.sort]);
+  const total=list.reduce((s,i)=>s+(eff(i)||0),0);
+  $('sum').innerHTML=`${view.tab==='want'?'ほしいもの':'手に入れた'} ${list.length}件<br>合計 <b>${yen(total)}</b>`;
+  $('count').textContent=view.cat;
+  renderSoon(inTab);
+  $('grid').innerHTML=list.map(i=>{
+    let day='';
+    if(view.tab==='want'){
+      if(saleOn(i)&&i.saleEnd)day=`セール ${leftTxt(daysTo(i.saleEnd))}`;
+      else if(i.eventDate&&daysTo(i.eventDate)>=0)day=`${esc(i.eventName||'日付')}まで ${leftTxt(daysTo(i.eventDate))}`;
+    }
+    return `
+    <div class="card${i.status==='got'?' got':''}" data-id="${i.id}">
+      <div class="ph">${i.photo?`<img src="${i.photo}" alt="">`:'🎁'}</div>
+      <span class="stars">${starTxt(i.stars)}</span>
+      ${i.status==='got'?'<span class="gotmark">✓</span>':saleOn(i)?`<span class="salemark">SALE${off(i)?' −'+off(i)+'%':''}</span>`:''}
+      <div class="info">
+        <div class="nm">${esc(i.name)}</div>
+        <div class="pr">${priceHtml(i)}</div>
+        <div class="shop">${esc(i.shop)}</div>
+        ${day?`<div class="day" style="${day.startsWith('セール')?'color:var(--sale)':''}">${day}</div>`:''}
+      </div>
+    </div>`;}).join('');
+  $('empty').innerHTML=list.length?'':(view.tab==='want'
+    ?'まだ何もありません。<br>右下の「＋ 追加」から、<br>ほしいもののスクショを入れてください。'
+    :'買ったもの・もらったものはここに並びます。');
+}
+/* もうすぐ：セールの終わりが3日以内、日付が30日以内 */
+function renderSoon(inTab){
+  if(view.tab!=='want'){$('soon').innerHTML='';return;}
+  const rows=[];
+  inTab.forEach(i=>{
+    if(saleOn(i)&&i.saleEnd){const n=daysTo(i.saleEnd);if(n<=3)rows.push({n,html:`<span class="tag s">セール ${n===0?'今日まで':'あと'+n+'日'}</span><span class="t">${esc(i.name)}</span>`,id:i.id});}
+    if(i.eventDate){const n=daysTo(i.eventDate);if(n>=0&&n<=30)rows.push({n,html:`<span class="tag">${esc(i.eventName||'日付')} ${leftTxt(n)}</span><span class="t">${esc(i.name)}</span>`,id:i.id});}
+  });
+  rows.sort((a,b)=>a.n-b.n);
+  $('soon').innerHTML=rows.length?`<div class="soon"><h3>⏰ もうすぐ</h3>${rows.map(r=>`<div data-soon="${r.id}">${r.html}</div>`).join('')}</div>`:'';
+}
+
+/* ---------- 写真を小さくして保存 ---------- */
+function shrink(file){return new Promise((res,rej)=>{
+  const u=URL.createObjectURL(file),img=new Image();
+  img.onload=()=>{
+    const k=Math.min(1,1000/Math.max(img.naturalWidth,img.naturalHeight));
+    const c=document.createElement('canvas');
+    c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);
+    const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(img,0,0,c.width,c.height);
+    URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',0.82));
+  };
+  img.onerror=()=>{URL.revokeObjectURL(u);rej();};
+  img.src=u;
+});}
+async function takePhoto(file){
+  if(!file||!file.type.startsWith('image/'))return;
+  try{formPhoto=await shrink(file);showPhoto();}catch(e){alert('この写真は読み込めませんでした');}
+}
+function showPhoto(){
+  $('photoPick').innerHTML=formPhoto?`<img src="${formPhoto}" alt="">`:'📷<br>スクショ・写真を選ぶ';
+}
+
+/* ---------- 追加・編集の画面 ---------- */
+function fillCats(sel){
+  $('fCat').innerHTML=cats.map(c=>`<option>${esc(c)}</option>`).join('')+'<option value="__new">＋ 新しい種類を作る</option>';
+  $('fCat').value=sel&&cats.includes(sel)?sel:(cats.includes(view.cat)?view.cat:cats[0]);
+  $('newcat').classList.remove('show');$('fNewCat').value='';
+}
+function setStars(n){formStars=n;[...$('starPick').children].forEach(b=>b.classList.toggle('on',+b.dataset.s===n));}
+function openForm(it){
+  editing=it||null;
+  $('formTitle').textContent=it?'編集':'ほしいものを追加';
+  formPhoto=it?it.photo:null;showPhoto();
+  $('fName').value=it?it.name:'';
+  fillCats(it&&it.cat);
+  $('fPrice').value=it&&num(it.price)!=null?it.price:'';
+  $('fShop').value=it?it.shop:'';
+  $('fUrl').value=it?it.url:'';
+  $('fSalePrice').value=it&&num(it.salePrice)!=null?it.salePrice:'';
+  $('fSaleEnd').value=it&&it.saleEnd||'';
+  $('fEventName').value=it&&it.eventName||'';
+  $('fEventDate').value=it&&it.eventDate||'';
+  $('fMemo').value=it?it.memo:'';
+  setStars(it?it.stars:2);
+  $('formModal').classList.add('open');
+}
+const digits=v=>{const d=String(v).replace(/[^\d]/g,'');return d===''?'':Number(d);};
+async function save(){
+  const name=$('fName').value.trim();
+  if(!name&&!formPhoto){alert('名前か写真を入れてください');return;}
+  let cat=$('fCat').value;
+  if(cat==='__new'){
+    cat=$('fNewCat').value.trim();
+    if(!cat){alert('新しい種類の名前を入れてください');return;}
+    if(!cats.includes(cat)){cats.splice(cats.length-1,0,cat);await saveCats();}
+  }
+  const salePrice=digits($('fSalePrice').value), saleEnd=$('fSaleEnd').value;
+  if(saleEnd&&salePrice===''){alert('セールの値段も入れてください');return;}
+  const it=Object.assign(editing||{id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),created:Date.now(),status:'want'},{
+    name:name||'（名前なし）',cat,price:digits($('fPrice').value),
+    shop:$('fShop').value.trim(),url:$('fUrl').value.trim(),memo:$('fMemo').value.trim(),
+    stars:formStars,photo:formPhoto,
+    salePrice,saleEnd,
+    eventName:$('fEventName').value.trim(),eventDate:$('fEventDate').value
+  });
+  if(!editing)items.push(it);
+  await putItem(it);
+  $('formModal').classList.remove('open');
+  if(current&&current.id===it.id)openDetail(it); else render();
+}
+
+/* ---------- くわしく ---------- */
+function openDetail(it){
+  current=it;
+  const url=it.url&&/^https?:\/\//.test(it.url)?it.url:'';
+  let pills='';
+  if(saleOn(it))pills+=`<span class="pill s">🏷 セール中${off(it)?' −'+off(it)+'%':''}${it.saleEnd?'（'+md(it.saleEnd)+'まで・'+leftTxt(daysTo(it.saleEnd))+'）':''}</span>`;
+  else if(saleOver(it))pills+=`<span class="pill e">セールは${md(it.saleEnd)}で終わりました</span>`;
+  if(it.eventDate)pills+=`<span class="pill d">📅 ${esc(it.eventName||'日付')} ${md(it.eventDate)}（${leftTxt(daysTo(it.eventDate))}）</span>`;
+  $('detBody').innerHTML=`
+    <h2><span>${esc(it.cat)}</span><button class="x" data-close>×</button></h2>
+    <div class="det-ph">${it.photo?`<img src="${it.photo}" alt="">`:'<div class="ph">🎁</div>'}</div>
+    <div class="det-nm">${esc(it.name)}</div>
+    <div class="det-pr">${priceHtml(it)}</div>
+    ${pills}
+    <div class="meta">${starTxt(it.stars)}　${esc(it.shop)}${it.status==='got'&&it.gotAt?`<br>手に入れた日：${new Date(it.gotAt).toLocaleDateString('ja-JP')}`:''}</div>
+    ${it.memo?`<div class="memo">${esc(it.memo)}</div>`:''}
+    ${url?`<a class="btn sub link" href="${esc(url)}" target="_blank" rel="noopener">お店のページを開く ↗</a>`:''}
+    <div class="row">
+      ${it.status==='got'
+        ?'<button class="btn sub" id="toggleGot">「ほしい」に戻す</button>'
+        :'<button class="btn ok" id="toggleGot">買った・もらった！</button>'}
+    </div>
+    <div class="row">
+      <button class="btn sub" id="editBtn">編集</button>
+      <button class="btn danger" id="delBtn">消す</button>
+    </div>`;
+  $('detModal').classList.add('open');
+  render();
+}
+
+/* ---------- バックアップ ---------- */
+async function backup(){
+  const data={app:'wishlist',ver:1,saved:Date.now(),cats,items};
+  const blob=new Blob([JSON.stringify(data)],{type:'application/json'});
+  const name=`ウィッシュ_バックアップ_${today()}.json`;
+  const file=new File([blob],name,{type:'application/json'});
+  try{
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});}
+    else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),5000);}
+    await setMeta('lastBackup',Date.now());showBackupInfo();
+  }catch(e){if(e.name!=='AbortError')alert('保存できませんでした');}
+}
+async function restore(file){
+  try{
+    const data=JSON.parse(await file.text());
+    if(data.app!=='wishlist'||!Array.isArray(data.items))throw 0;
+    if(!confirm(`バックアップ（${data.items.length}件）に置きかえます。今の記録は消えます。よいですか？`))return;
+    await run('items','readwrite',s=>s.clear());
+    for(const it of data.items)await putItem(it);
+    items=data.items;cats=data.cats&&data.cats.length?data.cats:DEFAULT_CATS.slice();await saveCats();
+    $('menuModal').classList.remove('open');render();alert('戻しました');
+  }catch(e){alert('このファイルは読み込めませんでした');}
+}
+async function showBackupInfo(){
+  const t=await getMeta('lastBackup');
+  $('backupInfo').textContent=t?'前回のバックアップ：'+new Date(t).toLocaleDateString('ja-JP'):'まだバックアップしていません';
+}
+
+/* ---------- 操作 ---------- */
+document.addEventListener('click',async e=>{
+  const t=e.target;
+  if(t.closest('[data-close]')||t.classList.contains('modal')){
+    t.closest('.modal').classList.remove('open');
+    if(t.closest('#detModal'))current=null;
+    return;
+  }
+  const clr=t.closest('[data-clear]');
+  if(clr){if(clr.dataset.clear==='sale'){$('fSalePrice').value='';$('fSaleEnd').value='';}else{$('fEventName').value='';$('fEventDate').value='';}return;}
+  const tab=t.closest('.tab');
+  if(tab){view.tab=tab.dataset.tab;view.cat='すべて';document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b===tab));render();return;}
+  const chip=t.closest('.chip');
+  if(chip){view.cat=chip.dataset.cat;render();return;}
+  const card=t.closest('.card'),soon=t.closest('[data-soon]');
+  if(card||soon){openDetail(items.find(i=>i.id===(card?card.dataset.id:soon.dataset.soon)));return;}
+  const sb=t.closest('#starPick button');
+  if(sb){setStars(+sb.dataset.s);return;}
+  if(t.id==='toggleGot'){
+    const it=current;
+    if(it.status==='got'){it.status='want';delete it.gotAt;}else{it.status='got';it.gotAt=Date.now();}
+    await putItem(it);$('detModal').classList.remove('open');current=null;render();return;
+  }
+  if(t.id==='editBtn'){openForm(current);return;}
+  if(t.id==='delBtn'){
+    if(!confirm('「'+current.name+'」を消しますか？'))return;
+    items=items.filter(i=>i!==current);await delItem(current.id);
+    $('detModal').classList.remove('open');current=null;render();return;
+  }
+});
+$('addBtn').onclick=()=>{current=null;openForm(null);};
+$('saveBtn').onclick=save;
+$('photoPick').onclick=()=>$('photoInput').click();
+$('photoInput').onchange=e=>{takePhoto(e.target.files[0]);e.target.value='';};
+$('fCat').onchange=()=>$('newcat').classList.toggle('show',$('fCat').value==='__new');
+$('sort').onchange=e=>{view.sort=e.target.value;render();};
+$('menuBtn').onclick=()=>{showBackupInfo();$('menuModal').classList.add('open');};
+$('backupBtn').onclick=backup;
+$('restoreBtn').onclick=()=>$('restoreInput').click();
+$('restoreInput').onchange=e=>{if(e.target.files[0])restore(e.target.files[0]);e.target.value='';};
+
+/* ---------- 見本（?demo を付けたときだけ。保存はしない） ---------- */
+function art(kind,bg,fg){
+  const shapes={
+    bag:`<path d="M70 80 Q100 30 130 80" fill="none" stroke="${fg}" stroke-width="7"/><rect x="45" y="78" width="110" height="85" rx="14" fill="${fg}"/><rect x="88" y="100" width="24" height="12" rx="3" fill="${bg}"/>`,
+    ring:`<circle cx="100" cy="115" r="42" fill="none" stroke="${fg}" stroke-width="10"/><path d="M100 50 l18 18 l-18 18 l-18 -18z" fill="#fff" stroke="${fg}" stroke-width="4"/>`,
+    shoe:`<path d="M35 140 L35 95 Q60 100 80 85 L120 120 Q160 125 168 140 Z" fill="${fg}"/><rect x="35" y="140" width="133" height="10" rx="4" fill="${fg}" opacity=".7"/>`,
+    neck:`<path d="M55 50 Q100 140 145 50" fill="none" stroke="${fg}" stroke-width="4"/><circle cx="100" cy="102" r="14" fill="${fg}"/>`,
+    coat:`<path d="M70 45 L130 45 L160 80 L150 160 L50 160 L40 80 Z" fill="${fg}"/><path d="M100 45 L100 160" stroke="${bg}" stroke-width="3"/>`,
+    lip:`<rect x="82" y="95" width="36" height="65" rx="5" fill="${fg}"/><path d="M86 95 L86 60 Q100 45 114 60 L114 95 Z" fill="#b5483c"/>`
+  };
+  return 'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="${bg}"/>${shapes[kind]}</svg>`);
+}
+function demoItems(){
+  const d=Date.now(),h=3600e3,plus=n=>ymd(new Date(d+n*864e5));
+  return [
+    {name:'レザーのミニショルダーバッグ',cat:'バッグ',price:28600,shop:'ZOZOTOWN',stars:3,photo:art('bag','#f3e3d8','#9b6a4f'),memo:'色はキャメル',eventName:'誕生日',eventDate:plus(12)},
+    {name:'華奢なダイヤのリング',cat:'指輪',price:54000,shop:'Instagram で見つけたお店',stars:3,photo:art('ring','#eef0f4','#c9a24a'),memo:'サイズ 9号'},
+    {name:'キャンバストートバッグ',cat:'バッグ',price:12100,salePrice:8470,saleEnd:plus(2),shop:'楽天',stars:1,photo:art('bag','#e6efe6','#5f7f63')},
+    {name:'ショートブーツ',cat:'靴',price:19800,shop:'Amazon',stars:2,photo:art('shoe','#efe7f3','#5a4a66')},
+    {name:'パールのネックレス',cat:'アクセサリー',price:16500,shop:'minne',stars:2,photo:art('neck','#f6eee8','#b88a7a'),eventName:'発売日',eventDate:plus(25)},
+    {name:'ウールのロングコート',cat:'服',price:39600,salePrice:31680,saleEnd:plus(9),shop:'公式サイト',stars:2,photo:art('coat','#e9eef2','#4f6272')},
+    {name:'リップ（限定色）',cat:'コスメ',price:4400,shop:'@cosme',stars:1,photo:art('lip','#fbeef0','#2b2522'),status:'got',gotAt:d-2*24*h}
+  ].map((it,k)=>Object.assign({id:'demo'+k,created:d-k*h,status:'want',url:'',memo:'',salePrice:'',saleEnd:'',eventName:'',eventDate:''},it));
+}
+
+init();
+</script>
+</body>
+</html>
